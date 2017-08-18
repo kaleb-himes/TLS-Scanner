@@ -21,4 +21,5 @@ public enum ProbeType {
     PADDING_ORACLE,
     PROTOCOL_VERSION,
     SIGNATURE_AND_HASH,
+    EXTENSION,
 }

@@ -15,6 +15,8 @@ import de.rub.nds.tlsscanner.report.SiteReport;
 import de.rub.nds.tlsscanner.probe.CertificateProbe;
 import de.rub.nds.tlsscanner.probe.CiphersuiteOrderProbe;
 import de.rub.nds.tlsscanner.probe.CiphersuiteProbe;
+import de.rub.nds.tlsscanner.probe.ExtensionProbe;
+import de.rub.nds.tlsscanner.probe.ProbeType;
 import de.rub.nds.tlsscanner.probe.ProtocolVersionProbe;
 import de.rub.nds.tlsscanner.probe.TLSProbe;
 import java.util.LinkedList;
@@ -37,13 +39,13 @@ public class TLSScanner {
     public TLSScanner(String websiteHost, boolean attackingScans) {
         this.executor = new ScanJobExecutor(1);
         config = new ScannerConfig(new GeneralDelegate());
-        config.getGeneralDelegate().setLogLevel(Level.WARN);
+        config.getGeneralDelegate().setLogLevel(Level.DEBUG);
         ClientDelegate clientDelegate = (ClientDelegate) config.getDelegateList().get(1);
         clientDelegate.setHost(websiteHost);
         LoggerContext ctx = (LoggerContext) LogManager.getContext(false);
         Configuration ctxConfig = ctx.getConfiguration();
         LoggerConfig loggerConfig = ctxConfig.getLoggerConfig("de.rub.nds.tlsattacker");
-        loggerConfig.setLevel(Level.WARN);
+        loggerConfig.setLevel(Level.DEBUG);
         ctx.updateLoggers();
     }
 
@@ -55,14 +57,15 @@ public class TLSScanner {
 
     public SiteReport scan() {
         List<TLSProbe> testList = new LinkedList<>();
-        testList.add(new CertificateProbe(config));
-        testList.add(new ProtocolVersionProbe(config));
-        testList.add(new CiphersuiteProbe(config));
-        testList.add(new CiphersuiteOrderProbe(config));
+        //testList.add(new CertificateProbe(config));
+        //testList.add(new ProtocolVersionProbe(config));
+        //testList.add(new CiphersuiteProbe(config));
+        //testList.add(new CiphersuiteOrderProbe(config));
         // testList.add(new HeartbleedProbe(websiteHost));
         // testList.add(new NamedCurvesProbe(websiteHost));
         // testList.add(new PaddingOracleProbe(websiteHost));
         // testList.add(new SignatureAndHashAlgorithmProbe(websiteHost));
+        testList.add(new ExtensionProbe(config));
         ScanJob job = new ScanJob(testList);
         return executor.execute(config, job);
     }
