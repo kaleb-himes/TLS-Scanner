@@ -25,6 +25,7 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.LoggerContext;
 import org.apache.logging.log4j.core.config.Configuration;
+import org.apache.logging.log4j.core.config.Configurator;
 import org.apache.logging.log4j.core.config.LoggerConfig;
 
 /**
@@ -39,19 +40,15 @@ public class TLSScanner {
     public TLSScanner(String websiteHost, boolean attackingScans) {
         this.executor = new ScanJobExecutor(1);
         config = new ScannerConfig(new GeneralDelegate());
-        config.getGeneralDelegate().setLogLevel(Level.DEBUG);
         ClientDelegate clientDelegate = (ClientDelegate) config.getDelegateList().get(1);
         clientDelegate.setHost(websiteHost);
-        LoggerContext ctx = (LoggerContext) LogManager.getContext(false);
-        Configuration ctxConfig = ctx.getConfiguration();
-        LoggerConfig loggerConfig = ctxConfig.getLoggerConfig("de.rub.nds.tlsattacker");
-        loggerConfig.setLevel(Level.DEBUG);
-        ctx.updateLoggers();
+        Configurator.setRootLevel(Level.WARN);
     }
 
     public TLSScanner(ScannerConfig config) {
         this.executor = new ScanJobExecutor(config.getThreads());
         this.config = config;
+        config.getGeneralDelegate().setLogLevel(Level.WARN);
 
     }
 

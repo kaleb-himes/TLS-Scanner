@@ -30,15 +30,15 @@ public class ProbeResult {
 
     public String toString() {
         StringBuilder builder = new StringBuilder();
-        builder.append(type.name());
-        builder.append(":");
-        builder.append("\n");
+        // builder.append(type.name());
+        // builder.append(":");
+        // builder.append("\n");
         for (ResultValue value : resultList) {
             builder.append(value.toString());
-            builder.append("\n");
+            //  builder.append("\n");
         }
-        builder.append("Checks:\n");
-        builder.append(getCheckString());
+        // builder.append("Checks:\n");
+        // builder.append(getCheckString());
         return builder.toString();
     }
 

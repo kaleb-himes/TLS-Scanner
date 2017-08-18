@@ -39,7 +39,7 @@ public class ResultValue {
 
     @Override
     public String toString() {
-        return "" + field + ": " + value;
+        return value;
     }
 
 }

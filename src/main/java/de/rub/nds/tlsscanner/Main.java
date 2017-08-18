@@ -46,8 +46,14 @@ public class Main {
                 TLSScanner scanner = new TLSScanner(config);
                 long time = System.currentTimeMillis();
                 SiteReport report = scanner.scan();
-                LOGGER.info("Scanned in:" + ((System.currentTimeMillis()-time)/1000) + "s");
+                LOGGER.info("Scanned in:" + ((System.currentTimeMillis() - time) / 1000) + "s");
                 LOGGER.info(report.getStringReport());
+                StringBuilder resultCsvString = new StringBuilder();
+                resultCsvString.append("host,encryptThenMac,extendedMasterSecret,maxFragmentLength9,maxFragmentLength10,maxFragmentLength11,maxFragmentLength12,"
+                        + "certType,clientAuthz,clientCertUrl,renegotiationInfo,sessionTicket,truncatedHmac,useSrtp,tok1,"
+                        + "tok2,tok3,tok4,tok5,tok6,tok7,tok8,tok9,tok10,tok11,tok12,tok13,tok14,tok15\r\n");
+                resultCsvString.append(report.getStringReport());
+                System.out.println(resultCsvString.toString());
             } catch (ConfigurationException E) {
                 LOGGER.info("Encountered a ConfigurationException aborting.");
                 LOGGER.debug(E);
@@ -58,19 +64,17 @@ public class Main {
             commander.usage();
         }
     }
-    
-    public static void scanFile(File f) throws FileNotFoundException, IOException
-    {
+
+    public static void scanFile(File f) throws FileNotFoundException, IOException {
         GeneralDelegate delegate = new GeneralDelegate();
         delegate.setLogLevel(Level.WARN);
         delegate.applyDelegate(Config.createConfig());
         BufferedReader reader = new BufferedReader(new FileReader(f));
         String line = null;
         line = reader.readLine();
-        while((line = reader.readLine()) != null)
-        {
+        while ((line = reader.readLine()) != null) {
             String host = line.split(",")[2];
-            TLSScanner scanner = new TLSScanner(host,false);
+            TLSScanner scanner = new TLSScanner(host, false);
             scanner.scan();
         }
         System.exit(0);

@@ -30,12 +30,12 @@ public class SiteReport {
 
     public String getStringReport() {
         StringBuilder builder = new StringBuilder();
-        builder.append("Report for ");
-        builder.append(host);
-        builder.append("\n");
+        //builder.append("Report for ");
+        //builder.append(host);
+        //builder.append("\n");
         for (ProbeResult result : resultList) {
             builder.append(result.toString());
-            builder.append("\n");
+            //builder.append("\n");
         }
         return builder.toString();
     }
