@@ -49,6 +49,8 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.core.config.Configurator;
 
 /**
  *
@@ -71,6 +73,7 @@ public class ExtensionProbe extends TLSProbe {
 
     @Override
     public ProbeResult call() {
+        Configurator.setRootLevel(Level.OFF);
         List<Config> extensionsToBeTested = new LinkedList<>();
         extensionsToBeTested.add(createEncryptThenMacConfig());
         extensionsToBeTested.add(createExtendedMasterSecretConfig());
