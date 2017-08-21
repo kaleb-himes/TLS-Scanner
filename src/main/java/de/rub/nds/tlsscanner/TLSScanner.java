@@ -42,13 +42,13 @@ public class TLSScanner {
         config = new ScannerConfig(new GeneralDelegate());
         ClientDelegate clientDelegate = (ClientDelegate) config.getDelegateList().get(1);
         clientDelegate.setHost(websiteHost);
-        Configurator.setRootLevel(Level.WARN);
+        Configurator.setRootLevel(Level.OFF);
     }
 
     public TLSScanner(ScannerConfig config) {
         this.executor = new ScanJobExecutor(config.getThreads());
         this.config = config;
-        config.getGeneralDelegate().setLogLevel(Level.WARN);
+        config.getGeneralDelegate().setLogLevel(Level.OFF);
 
     }
 

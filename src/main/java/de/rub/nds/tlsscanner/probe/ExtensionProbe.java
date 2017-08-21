@@ -19,6 +19,20 @@ import de.rub.nds.tlsattacker.core.constants.SrtpProtectionProfiles;
 import de.rub.nds.tlsattacker.core.constants.TokenBindingVersion;
 import de.rub.nds.tlsattacker.core.exceptions.WorkflowExecutionException;
 import de.rub.nds.tlsattacker.core.protocol.message.AlertMessage;
+import de.rub.nds.tlsattacker.core.protocol.message.HandshakeMessage;
+import de.rub.nds.tlsattacker.core.protocol.message.ServerHelloMessage;
+import de.rub.nds.tlsattacker.core.protocol.message.extension.CertificateTypeExtensionMessage;
+import de.rub.nds.tlsattacker.core.protocol.message.extension.ClientAuthzExtensionMessage;
+import de.rub.nds.tlsattacker.core.protocol.message.extension.ClientCertificateUrlExtensionMessage;
+import de.rub.nds.tlsattacker.core.protocol.message.extension.EncryptThenMacExtensionMessage;
+import de.rub.nds.tlsattacker.core.protocol.message.extension.ExtendedMasterSecretExtensionMessage;
+import de.rub.nds.tlsattacker.core.protocol.message.extension.ExtensionMessage;
+import de.rub.nds.tlsattacker.core.protocol.message.extension.MaxFragmentLengthExtensionMessage;
+import de.rub.nds.tlsattacker.core.protocol.message.extension.RenegotiationInfoExtensionMessage;
+import de.rub.nds.tlsattacker.core.protocol.message.extension.SessionTicketTLSExtensionMessage;
+import de.rub.nds.tlsattacker.core.protocol.message.extension.SrtpExtensionMessage;
+import de.rub.nds.tlsattacker.core.protocol.message.extension.TokenBindingExtensionMessage;
+import de.rub.nds.tlsattacker.core.protocol.message.extension.TruncatedHmacExtensionMessage;
 import de.rub.nds.tlsattacker.core.state.TlsContext;
 import de.rub.nds.tlsattacker.core.workflow.WorkflowExecutor;
 import de.rub.nds.tlsattacker.core.workflow.WorkflowExecutorFactory;
@@ -95,89 +109,101 @@ public class ExtensionProbe extends TLSProbe {
             }
             if (WorkflowTraceUtil.didReceiveMessage(HandshakeMessageType.SERVER_HELLO, tlsContext.getWorkflowTrace())) {
 
-                if (tlsContext.isEncryptThenMacExtensionIsPresent()) {
-                    results[0] = true;
-                }
-                if (tlsContext.isExtendedMasterSecretExtension()) {
-                    results[1] = true;
-                }
-                if (tlsContext.getMaxFragmentLength() == MaxFragmentLength.TWO_9) {
-                    results[2] = true;
-                }
-                if (tlsContext.getMaxFragmentLength() == MaxFragmentLength.TWO_10) {
-                    results[3] = true;
-                }
-                if (tlsContext.getMaxFragmentLength() == MaxFragmentLength.TWO_11) {
-                    results[4] = true;
-                }
-                if (tlsContext.getMaxFragmentLength() == MaxFragmentLength.TWO_12) {
-                    results[5] = true;
-                }
-                if (tlsContext.getCertificateTypeDesiredTypes() != null) {
-                    results[6] = true;
-                }
-                if (tlsContext.getClientAuthzDataFormatList() != null) {
-                    results[7] = true;
-                }
-                if (tlsContext.isClientCertificateUrlExtensionIsPresent()) {
-                    results[8] = true;
-                }
-                if (tlsContext.getRenegotiationInfo() != null) {
-                    results[9] = true;
-                }
-                if (tlsContext.getSessionTicketTLS() != null) {
-                    results[10] = true;
-                }
-                if (tlsContext.isTruncatedHmacExtensionIsPresent()) {
-                    results[11] = true;
-                }
-                if (tlsContext.getSecureRealTimeTransportProtocolProtectionProfiles() != null) {
-                    results[12] = true;
-                }
-                if (tlsContext.getTokenBindingVersion() == TokenBindingVersion.DRAFT_1) {
-                    results[13] = true;
-                }
-                if (tlsContext.getTokenBindingVersion() == TokenBindingVersion.DRAFT_2) {
-                    results[14] = true;
-                }
-                if (tlsContext.getTokenBindingVersion() == TokenBindingVersion.DRAFT_3) {
-                    results[15] = true;
-                }
-                if (tlsContext.getTokenBindingVersion() == TokenBindingVersion.DRAFT_4) {
-                    results[16] = true;
-                }
-                if (tlsContext.getTokenBindingVersion() == TokenBindingVersion.DRAFT_5) {
-                    results[17] = true;
-                }
-                if (tlsContext.getTokenBindingVersion() == TokenBindingVersion.DRAFT_6) {
-                    results[18] = true;
-                }
-                if (tlsContext.getTokenBindingVersion() == TokenBindingVersion.DRAFT_7) {
-                    results[19] = true;
-                }
-                if (tlsContext.getTokenBindingVersion() == TokenBindingVersion.DRAFT_8) {
-                    results[20] = true;
-                }
-                if (tlsContext.getTokenBindingVersion() == TokenBindingVersion.DRAFT_9) {
-                    results[21] = true;
-                }
-                if (tlsContext.getTokenBindingVersion() == TokenBindingVersion.DRAFT_10) {
-                    results[22] = true;
-                }
-                if (tlsContext.getTokenBindingVersion() == TokenBindingVersion.DRAFT_11) {
-                    results[23] = true;
-                }
-                if (tlsContext.getTokenBindingVersion() == TokenBindingVersion.DRAFT_12) {
-                    results[24] = true;
-                }
-                if (tlsContext.getTokenBindingVersion() == TokenBindingVersion.DRAFT_13) {
-                    results[25] = true;
-                }
-                if (tlsContext.getTokenBindingVersion() == TokenBindingVersion.DRAFT_14) {
-                    results[26] = true;
-                }
-                if (tlsContext.getTokenBindingVersion() == TokenBindingVersion.DRAFT_15) {
-                    results[27] = true;
+                HandshakeMessage serverHelloMessage = WorkflowTraceUtil.getFirstReceivedMessage(HandshakeMessageType.SERVER_HELLO, tlsContext.getWorkflowTrace());
+
+                List<ExtensionMessage> extensionMessages = new LinkedList<>();
+                extensionMessages = serverHelloMessage.getExtensions();
+
+                for (ExtensionMessage message : extensionMessages) {
+
+                    if (message instanceof EncryptThenMacExtensionMessage) {
+                        results[0] = true;
+                    }
+                    if (message instanceof ExtendedMasterSecretExtensionMessage) {
+                        results[1] = true;
+                    }
+                    if (message instanceof MaxFragmentLengthExtensionMessage) {
+                        if (MaxFragmentLength.getMaxFragmentLength(((MaxFragmentLengthExtensionMessage) message).getMaxFragmentLength().getValue()[0]) == MaxFragmentLength.TWO_9) {
+                            results[2] = true;
+                        }
+                        if (MaxFragmentLength.getMaxFragmentLength(((MaxFragmentLengthExtensionMessage) message).getMaxFragmentLength().getValue()[0]) == MaxFragmentLength.TWO_10) {
+                            results[3] = true;
+                        }
+                        if (MaxFragmentLength.getMaxFragmentLength(((MaxFragmentLengthExtensionMessage) message).getMaxFragmentLength().getValue()[0]) == MaxFragmentLength.TWO_11) {
+                            results[4] = true;
+                        }
+                        if (MaxFragmentLength.getMaxFragmentLength(((MaxFragmentLengthExtensionMessage) message).getMaxFragmentLength().getValue()[0]) == MaxFragmentLength.TWO_12) {
+                            results[5] = true;
+                        }
+                    }
+                    if (message instanceof CertificateTypeExtensionMessage) {
+                        results[6] = true;
+                    }
+                    if (message instanceof ClientAuthzExtensionMessage) {
+                        results[7] = true;
+                    }
+                    if (message instanceof ClientCertificateUrlExtensionMessage) {
+                        results[8] = true;
+                    }
+                    if (message instanceof RenegotiationInfoExtensionMessage) {
+                        results[9] = true;
+                    }
+                    if (message instanceof SessionTicketTLSExtensionMessage) {
+                        results[10] = true;
+                    }
+                    if (message instanceof TruncatedHmacExtensionMessage) {
+                        results[11] = true;
+                    }
+                    if (message instanceof SrtpExtensionMessage) {
+                        results[12] = true;
+                    }
+                    if (message instanceof TokenBindingExtensionMessage) {
+                        if (TokenBindingVersion.getExtensionType(((TokenBindingExtensionMessage) message).getTokenbindingVersion().getValue()) == TokenBindingVersion.DRAFT_1) {
+                            results[13] = true;
+                        }
+                        if (TokenBindingVersion.getExtensionType(((TokenBindingExtensionMessage) message).getTokenbindingVersion().getValue()) == TokenBindingVersion.DRAFT_2) {
+                            results[14] = true;
+                        }
+                        if (TokenBindingVersion.getExtensionType(((TokenBindingExtensionMessage) message).getTokenbindingVersion().getValue()) == TokenBindingVersion.DRAFT_3) {
+                            results[15] = true;
+                        }
+                        if (TokenBindingVersion.getExtensionType(((TokenBindingExtensionMessage) message).getTokenbindingVersion().getValue()) == TokenBindingVersion.DRAFT_4) {
+                            results[16] = true;
+                        }
+                        if (TokenBindingVersion.getExtensionType(((TokenBindingExtensionMessage) message).getTokenbindingVersion().getValue()) == TokenBindingVersion.DRAFT_5) {
+                            results[17] = true;
+                        }
+                        if (TokenBindingVersion.getExtensionType(((TokenBindingExtensionMessage) message).getTokenbindingVersion().getValue()) == TokenBindingVersion.DRAFT_6) {
+                            results[18] = true;
+                        }
+                        if (TokenBindingVersion.getExtensionType(((TokenBindingExtensionMessage) message).getTokenbindingVersion().getValue()) == TokenBindingVersion.DRAFT_7) {
+                            results[19] = true;
+                        }
+                        if (TokenBindingVersion.getExtensionType(((TokenBindingExtensionMessage) message).getTokenbindingVersion().getValue()) == TokenBindingVersion.DRAFT_8) {
+                            results[20] = true;
+                        }
+                        if (TokenBindingVersion.getExtensionType(((TokenBindingExtensionMessage) message).getTokenbindingVersion().getValue()) == TokenBindingVersion.DRAFT_9) {
+                            results[21] = true;
+                        }
+                        if (TokenBindingVersion.getExtensionType(((TokenBindingExtensionMessage) message).getTokenbindingVersion().getValue()) == TokenBindingVersion.DRAFT_10) {
+                            results[22] = true;
+                        }
+                        if (TokenBindingVersion.getExtensionType(((TokenBindingExtensionMessage) message).getTokenbindingVersion().getValue()) == TokenBindingVersion.DRAFT_11) {
+                            results[23] = true;
+                        }
+                        if (TokenBindingVersion.getExtensionType(((TokenBindingExtensionMessage) message).getTokenbindingVersion().getValue()) == TokenBindingVersion.DRAFT_12) {
+                            results[24] = true;
+                        }
+                        if (TokenBindingVersion.getExtensionType(((TokenBindingExtensionMessage) message).getTokenbindingVersion().getValue()) == TokenBindingVersion.DRAFT_13) {
+                            results[25] = true;
+                        }
+                        if (TokenBindingVersion.getExtensionType(((TokenBindingExtensionMessage) message).getTokenbindingVersion().getValue()) == TokenBindingVersion.DRAFT_14) {
+                            results[26] = true;
+                        }
+                        if (TokenBindingVersion.getExtensionType(((TokenBindingExtensionMessage) message).getTokenbindingVersion().getValue()) == TokenBindingVersion.DRAFT_15) {
+                            results[27] = true;
+                        }
+                    }
                 }
 
             } else {

@@ -43,6 +43,7 @@ public class Main {
             }
             // Cmd was parsable
             try {
+                /*
                 TLSScanner scanner = new TLSScanner(config);
                 long time = System.currentTimeMillis();
                 SiteReport report = scanner.scan();
@@ -54,6 +55,9 @@ public class Main {
                         + "tok2,tok3,tok4,tok5,tok6,tok7,tok8,tok9,tok10,tok11,tok12,tok13,tok14,tok15\r\n");
                 resultCsvString.append(report.getStringReport());
                 System.out.println(resultCsvString.toString());
+                 */
+                File hostList = new File("C:\\SVN\\literature\\hosts.txt");
+                scanFile(hostList);
             } catch (ConfigurationException E) {
                 LOGGER.info("Encountered a ConfigurationException aborting.");
                 LOGGER.debug(E);
@@ -66,17 +70,22 @@ public class Main {
     }
 
     public static void scanFile(File f) throws FileNotFoundException, IOException {
+        StringBuilder resultCsvString = new StringBuilder();
+        resultCsvString.append("host,encryptThenMac,extendedMasterSecret,maxFragmentLength9,maxFragmentLength10,maxFragmentLength11,maxFragmentLength12,"
+                + "certType,clientAuthz,clientCertUrl,renegotiationInfo,sessionTicket,truncatedHmac,useSrtp,tok1,"
+                + "tok2,tok3,tok4,tok5,tok6,tok7,tok8,tok9,tok10,tok11,tok12,tok13,tok14,tok15\r\n");
         GeneralDelegate delegate = new GeneralDelegate();
-        delegate.setLogLevel(Level.WARN);
+        delegate.setLogLevel(Level.OFF);
         delegate.applyDelegate(Config.createConfig());
         BufferedReader reader = new BufferedReader(new FileReader(f));
-        String line = null;
-        line = reader.readLine();
+        String line;
         while ((line = reader.readLine()) != null) {
-            String host = line.split(",")[2];
+            String host = line;
             TLSScanner scanner = new TLSScanner(host, false);
-            scanner.scan();
+            SiteReport report = scanner.scan();
+            resultCsvString.append(report.getStringReport());
         }
+        System.out.println(resultCsvString.toString());
         System.exit(0);
     }
 }
