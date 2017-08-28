@@ -19,8 +19,10 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.core.config.Configurator;
 
 /**
  *
@@ -37,6 +39,7 @@ public class ScanJobExecutor {
     }
 
     public SiteReport execute(ScannerConfig config, ScanJob scanJob) {
+        Configurator.setRootLevel(Level.OFF);
         List<Future<ProbeResult>> futureResults = new LinkedList<>();
         for (TLSProbe probe : scanJob.getProbeList()) {
             futureResults.add(executor.submit(probe));
@@ -48,7 +51,7 @@ public class ScanJobExecutor {
             } catch (InterruptedException | ExecutionException ex) {
                 LOGGER.warn("Encoutered Exception while retrieving probeResult");
                 LOGGER.warn(ex);
-                ex.printStackTrace();
+                //ex.printStackTrace();
             }
         }
         executor.shutdown();
